@@ -28,9 +28,9 @@ function Home() {
                   <span className="text-xs text-gray-500">Bieżąca cena:</span>
                   <p className="text-xl font-bold text-gray-950">{auction.currentPrice.toFixed(2)} PLN</p>
                 </div>
-                <button className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-black transition">
-                  Licytuj
-                </button>
+                <Link to={`/auction/${auction.id}`} className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-black transition text-center">
+                Licytuj
+                </Link>
               </div>
             </div>
           ))}
