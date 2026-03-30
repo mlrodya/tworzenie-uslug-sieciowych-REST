@@ -6,11 +6,16 @@ function Home() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <nav className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link to="/" className="text-3xl font-extrabold text-blue-600">VIZJA Auctions</Link>
-          <Link to="/login" className="bg-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-blue-700 transition">
-            Zaloguj się
-          </Link>
-        </nav>
+        <Link to="/" className="text-3xl font-extrabold text-blue-600">VIZJA Auctions</Link>
+        <div className="flex gap-4">
+        <Link to="/add-auction" className="text-gray-600 font-semibold px-4 py-2 hover:text-blue-600 transition flex items-center">
+            + Wystaw przedmiot
+        </Link>
+    <Link to="/login" className="bg-blue-600 text-white px-5 py-2.5 rounded-full text-sm font-semibold hover:bg-blue-700 transition">
+      Zaloguj się
+    </Link>
+  </div>
+</nav>
       </header>
 
       <main className="max-w-7xl mx-auto px-6 py-12">
