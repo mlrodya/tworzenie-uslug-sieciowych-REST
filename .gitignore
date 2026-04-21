@@ -416,4 +416,13 @@ FodyWeavers.xsd
 *.msix
 *.msm
 *.msp
+<<<<<<< HEAD
 frontend/node_modules/
+=======
+
+frontend/node_modules/
+node_modules/
+bin/
+obj/
+.vs/
+>>>>>>> 3f821eb... fix: apply proper gitignore
