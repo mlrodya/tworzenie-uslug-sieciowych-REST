@@ -1,70 +1,113 @@
 # 🛒 Rozproszony System Aukcyjny (REST API)
 
 Projekt zaliczeniowy z przedmiotu: **Tworzenie usług sieciowych REST**.
-System umożliwia wystawianie przedmiotów, licytację w czasie rzeczywistym oraz zarządzanie kontami użytkowników. Zbudowany zgodnie z założeniami architektury REST oraz wzorcem MVC z wyraźnym podziałem na warstwy (Controller, Service, Repository).
+System umożliwia wystawianie przedmiotów, licytację oraz zarządzanie kontami użytkowników. Zbudowany zgodnie z założeniami architektury REST oraz wzorcem warstwowym (Controller – Service – Repository – Model).
 
 ## 🚀 Technologie
-- **Backend:** .NET 8 (ASP.NET Core Web API)
+- **Backend:** .NET 9 (ASP.NET Core Web API)
 - **Baza Danych:** PostgreSQL + Entity Framework Core (ORM)
 - **Frontend:** React + Vite
 - **Infrastruktura:** Docker, Docker Compose
-- **Autoryzacja:** JSON Web Tokens (JWT)
+- **Autoryzacja:** JSON Web Tokens (JWT) + hashowanie haseł BCrypt
 
 ## 🏗 Architektura Systemu
-Projekt został podzielony na dwie główne części (Monorepo):
-1. `/backend` - Logika biznesowa, autoryzacja, walidacja i dostęp do bazy danych. Komunikacja z bazą odbywa się wyłącznie poprzez repozytoria, a kontrolery służą jedynie do przyjmowania żądań i zwracania odpowiednich statusów HTTP.
-2. `/frontend` - Aplikacja kliencka SPA, komunikująca się z systemem backendowym za pomocą asynchronicznych zapytań HTTP (REST).
+Projekt podzielony jest na dwie części (monorepo):
+1. `/backend` – logika biznesowa, walidacja i dostęp do bazy danych.
+   Warstwy: **Controller → Service → Repository → Model (EF Core)**.
+   Komunikacja z bazą wyłącznie przez repozytoria; kontrolery przyjmują żądania i zwracają kody HTTP.
+2. `/frontend` – aplikacja kliencka SPA (React), komunikująca się z systemem **wyłącznie przez REST API** (`fetch`).
 
-[Tutaj wkleimy link do wygenerowanego diagramu ERD]
+> Interfejs użytkownika nie łączy się bezpośrednio z bazą danych – tylko przez REST API.
 
 ## 🛠 Instrukcja Uruchomienia (Lokalnie)
 
-Aby uruchomić pełne środowisko na swoim komputerze, upewnij się, że posiadasz zainstalowanego **Dockera** oraz środowisko **Node.js** i **.NET 8 SDK**.
+Wymagania: **Docker**, **Node.js** oraz **.NET 9 SDK**.
 
-### 1. Baza Danych
-W głównym folderze projektu uruchom kontener z bazą PostgreSQL:
+### 1. Baza danych (PostgreSQL w kontenerze)
+W głównym folderze projektu:
 ```bash
 docker-compose up -d
-2. Backend (API)
+```
+Baza wystartuje na porcie `5432`.
 
-Przejdź do folderu backendu, zainstaluj zależności i uruchom serwer:
+### 2. Backend (API)
+```bash
 cd backend
-dotnet restore
 dotnet run
-API będzie dostępne pod adresem: http://localhost:5000 (lub wskazanym przez Kestrel), a dokumentacja Swagger pod /swagger.
+```
+Przy starcie aplikacja **automatycznie zakłada schemat bazy (migracje)** i **dodaje dane startowe** (seed).
+- API: `http://localhost:5049`
+- Dokumentacja Swagger: `http://localhost:5049/swagger`
 
-3. Frontend (Interfejs Użytkownika)
-
-Przejdź do folderu frontendu, zainstaluj paczki NPM i uruchom serwer deweloperski:
+### 3. Frontend (interfejs użytkownika)
+```bash
 cd frontend
 npm install
 npm run dev
-Aplikacja webowa otworzy się pod adresem: http://localhost:5173.
+```
+Aplikacja: `http://localhost:5173`
 
-📡 Główne Endpointy API
-Zgodnie z wymogami REST, API wykorzystuje standardowe metody HTTP oraz kody odpowiedzi (200, 201, 204, 400, 404, 500).
+### 👤 Konto demonstracyjne
+```
+e-mail:  demo@demo.com
+hasło:   Password123
+```
 
-Użytkownicy
+## 📡 Endpointy API
+Bazowy adres: `http://localhost:5049/api`. Format danych: JSON. Standardowe kody HTTP (200, 201, 204, 400, 401, 404, 500).
 
-POST /users - Rejestracja nowego użytkownika
+### Użytkownicy
+| Metoda | Endpoint | Opis |
+|---|---|---|
+| POST | `/users` | Rejestracja nowego użytkownika |
+| POST | `/users/login` | Logowanie – zwraca token JWT |
+| GET | `/users` | Lista użytkowników |
+| GET | `/users/{id}` | Dane użytkownika |
+| PUT | `/users/{id}` | Edycja użytkownika |
+| DELETE | `/users/{id}` | Usunięcie użytkownika |
 
-POST /users/login - Logowanie i pobranie tokenu JWT
+### Aukcje
+| Metoda | Endpoint | Opis |
+|---|---|---|
+| GET | `/auctions` | Lista aukcji (paginacja `?page=&pageSize=`, filtr `?categoryId=`) |
+| GET | `/auctions/{id}` | Szczegóły aukcji |
+| POST | `/auctions` | Wystawienie przedmiotu |
+| PUT | `/auctions/{id}` | Edycja aukcji |
+| DELETE | `/auctions/{id}` | Usunięcie aukcji |
 
-GET /users/{id} - Pobranie danych profilu
+### Licytacja
+| Metoda | Endpoint | Opis |
+|---|---|---|
+| POST | `/auctions/{id}/bids` | Złożenie oferty (sprawdza, czy wyższa od aktualnej i czy aukcja trwa) |
+| GET | `/auctions/{id}/bids` | Historia ofert dla aukcji |
 
-Aukcje
+## 🗃 Model danych (ERD – uproszczony)
+```
+User (Id, Username, Email, PasswordHash, Role)
+   │ 1
+   │
+   │ N
+Auction (Id, Title, Description, StartingPrice, CurrentPrice,
+         StartDate, EndDate, CategoryId, OwnerId→User, ImageUrl)
+   │ 1
+   │
+   │ N
+Bid (Id, Amount, UserId→User, AuctionId→Auction, CreatedAt)
+```
 
-GET /auctions - Pobranie listy aukcji (obsługuje filtrowanie i paginację)
+## ✅ Zrealizowane wymagania
+- REST API dla użytkowników, aukcji i licytacji (pełny CRUD + poprawne kody HTTP)
+- Architektura warstwowa (Controller / Service / Repository / Model)
+- Trwałe przechowywanie danych (PostgreSQL + EF Core, migracje)
+- DTO + walidacja danych wejściowych (Data Annotations)
+- Globalna obsługa wyjątków
+- Dokumentacja API (Swagger / OpenAPI)
+- Autoryzacja JWT + hashowanie haseł (BCrypt)
+- Paginacja i filtrowanie listy aukcji
+- Konteneryzacja bazy (Docker Compose)
+- Interfejs SPA komunikujący się wyłącznie przez REST API
 
-POST /auctions - Wystawienie przedmiotu na aukcję
-
-GET /auctions/{id} - Szczegóły aukcji
-
-POST /auctions/{id}/bids - Złożenie nowej oferty (Licytacja)
-
-👥 Zespół Projektowy
-Osoba 1 - Baza Danych, Autoryzacja JWT, Logowanie (Serilog)
-
-Osoba 2 - Logika Biznesowa (Aukcje, Licytacje), Paginacja, Testy Jednostkowe
-
-Mikhail Rodia - Frontend (React), Integracja API, Konteneryzacja (Docker), Wdrożenie
+## 👥 Zespół Projektowy
+- Osoba 1 – Baza danych, autoryzacja JWT
+- Osoba 2 – Logika biznesowa (aukcje, licytacje), paginacja
+- Mikhail Rodia – Frontend (React), integracja API, konteneryzacja (Docker)

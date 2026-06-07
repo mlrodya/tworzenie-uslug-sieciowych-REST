@@ -1,4 +1,4 @@
-﻿using AuctionSystem.API.DTOs;
+using AuctionSystem.API.DTOs;
 using AuctionSystem.API.Repositories;
 using AuctionSystem.API.Models;
 
@@ -48,17 +48,13 @@ namespace AuctionSystem.API.Services
         public async Task<List<AuctionResponseDto>> GetAllAuctions(int page, int pageSize, int? categoryId)
         {
             var auctions = await _repository.GetAllAsync(page, pageSize, categoryId);
+            return auctions.Select(MapToDto).ToList();
+        }
 
-            return auctions.Select(a => new AuctionResponseDto
-            {
-                Id = a.Id,
-                Title = a.Title,
-                Description = a.Description,
-                CurrentPrice = a.CurrentPrice,
-                EndTime = a.EndDate,
-                CategoryId = a.CategoryId,
-                OwnerId = a.OwnerId
-            }).ToList();
+        public async Task<AuctionResponseDto?> GetAuctionById(int id)
+        {
+            var auction = await _repository.GetByIdAsync(id);
+            return auction == null ? null : MapToDto(auction);
         }
 
         public async Task CreateAuction(CreateAuctionDto dto)
@@ -69,12 +65,73 @@ namespace AuctionSystem.API.Services
                 Description = dto.Description,
                 StartingPrice = dto.StartingPrice,
                 CurrentPrice = dto.StartingPrice,
+                StartDate = DateTime.UtcNow,
                 EndDate = DateTime.SpecifyKind(dto.EndDate, DateTimeKind.Utc),
                 CategoryId = dto.CategoryId,
-                OwnerId = dto.OwnerId
+                OwnerId = dto.OwnerId,
+                ImageUrl = dto.ImageUrl
             };
 
             await _repository.AddAsync(auction);
         }
+
+        public async Task<bool> UpdateAuction(int id, CreateAuctionDto dto)
+        {
+            var auction = await _repository.GetByIdAsync(id);
+            if (auction == null)
+                return false;
+
+            auction.Title = dto.Title;
+            auction.Description = dto.Description;
+            auction.StartingPrice = dto.StartingPrice;
+            auction.EndDate = DateTime.SpecifyKind(dto.EndDate, DateTimeKind.Utc);
+            auction.CategoryId = dto.CategoryId;
+            auction.OwnerId = dto.OwnerId;
+            auction.ImageUrl = dto.ImageUrl;
+
+            await _repository.UpdateAsync(auction);
+            return true;
+        }
+
+        public async Task<bool> DeleteAuction(int id)
+        {
+            var auction = await _repository.GetByIdAsync(id);
+            if (auction == null)
+                return false;
+
+            await _repository.DeleteAsync(auction);
+            return true;
+        }
+
+        public async Task<List<BidResponseDto>?> GetBidHistory(int auctionId)
+        {
+            var auction = await _repository.GetByIdAsync(auctionId);
+            if (auction == null)
+                return null;
+
+            var bids = await _bidRepository.GetByAuctionAsync(auctionId);
+            return bids.Select(b => new BidResponseDto
+            {
+                Id = b.Id,
+                Amount = b.Amount,
+                UserId = b.UserId,
+                AuctionId = b.AuctionId,
+                CreatedAt = b.CreatedAt
+            }).ToList();
+        }
+
+        private static AuctionResponseDto MapToDto(Auction a) => new AuctionResponseDto
+        {
+            Id = a.Id,
+            Title = a.Title,
+            Description = a.Description,
+            StartingPrice = a.StartingPrice,
+            CurrentPrice = a.CurrentPrice,
+            StartTime = a.StartDate,
+            EndTime = a.EndDate,
+            CategoryId = a.CategoryId,
+            OwnerId = a.OwnerId,
+            ImageUrl = a.ImageUrl
+        };
     }
 }

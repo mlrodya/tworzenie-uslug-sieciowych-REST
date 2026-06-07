@@ -1,5 +1,6 @@
-﻿using AuctionSystem.API.Data;
+using AuctionSystem.API.Data;
 using AuctionSystem.API.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace AuctionSystem.API.Repositories
 {
@@ -16,6 +17,14 @@ namespace AuctionSystem.API.Repositories
         {
             await _context.Bids.AddAsync(bid);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Bid>> GetByAuctionAsync(int auctionId)
+        {
+            return await _context.Bids
+                .Where(b => b.AuctionId == auctionId)
+                .OrderByDescending(b => b.Amount)
+                .ToListAsync();
         }
     }
 }

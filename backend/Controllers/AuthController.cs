@@ -81,11 +81,12 @@ namespace AuctionSystem.API.Controllers
             var tokenString = tokenHandler.WriteToken(token);
 
             // 4. Zwrot czystego tokenu i danych
-            return Ok(new { 
-                message = "Zalogowano pomyślnie!", 
+            return Ok(new {
+                message = "Zalogowano pomyślnie!",
                 token = tokenString,
-                username = user.Username, 
-                role = user.Role 
+                userId = user.Id,
+                username = user.Username,
+                role = user.Role
             });
         }
     }

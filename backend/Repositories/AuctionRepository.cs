@@ -1,4 +1,4 @@
-﻿using AuctionSystem.API.Data;
+using AuctionSystem.API.Data;
 using AuctionSystem.API.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -21,16 +21,19 @@ namespace AuctionSystem.API.Repositories
                 query = query.Where(a => a.CategoryId == categoryId);
 
             return await query
+                .OrderByDescending(a => a.Id)
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .ToListAsync();
         }
+
         public async Task AddAsync(Auction auction)
         {
             await _context.Auctions.AddAsync(auction);
             await _context.SaveChangesAsync();
         }
-        public async Task<Auction> GetByIdAsync(int id)
+
+        public async Task<Auction?> GetByIdAsync(int id)
         {
             return await _context.Auctions.FindAsync(id);
         }
@@ -40,6 +43,11 @@ namespace AuctionSystem.API.Repositories
             _context.Auctions.Update(auction);
             await _context.SaveChangesAsync();
         }
-    }
 
+        public async Task DeleteAsync(Auction auction)
+        {
+            _context.Auctions.Remove(auction);
+            await _context.SaveChangesAsync();
+        }
+    }
 }
