@@ -108,6 +108,6 @@ Bid (Id, Amount, UserId→User, AuctionId→Auction, CreatedAt)
 - Interfejs SPA komunikujący się wyłącznie przez REST API
 
 ## 👥 Zespół Projektowy
-- Osoba 1 – Baza danych, autoryzacja JWT
-- Osoba 2 – Logika biznesowa (aukcje, licytacje), paginacja
+- Vieronika Shcherban – Baza danych, autoryzacja JWT
+- Maciej Jagodziński – Logika biznesowa (aukcje, licytacje), paginacja
 - Mikhail Rodia – Frontend (React), integracja API, konteneryzacja (Docker)

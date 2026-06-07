@@ -5,6 +5,11 @@ Projekt zaliczeniowy z przedmiotu **Tworzenie usług sieciowych REST**.
 - **Repozytorium kodu:** https://github.com/mlrodya/tworzenie-uslug-sieciowych-REST
 - **Frontend (Vercel):** https://tworzenie-uslug-sieciowych-rest.vercel.app
 
+**Zespół projektowy:**
+- Vieronika Shcherban — baza danych, autoryzacja JWT
+- Maciej Jagodziński — logika biznesowa (aukcje, licytacje), paginacja
+- Mikhail Rodia — frontend (React), integracja API, konteneryzacja (Docker)
+
 Spis treści:
 1. [Opis systemu](#1-opis-systemu)
 2. [Stos technologiczny](#2-stos-technologiczny)

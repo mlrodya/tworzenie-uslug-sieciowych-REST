@@ -78,8 +78,8 @@ Krótko pokaż/wymień, że spełniamy wymagania:
 - **Punkty dodatkowe:** JWT + BCrypt, paginacja i filtrowanie, konteneryzacja (Docker)
 
 ## 5. Podział pracy w zespole (30 s)
-- Osoba 1 — baza danych, autoryzacja JWT
-- Osoba 2 — logika biznesowa (aukcje, licytacje), paginacja
+- Vieronika Shcherban — baza danych, autoryzacja JWT
+- Maciej Jagodziński — logika biznesowa (aukcje, licytacje), paginacja
 - Mikhail Rodia — frontend (React), integracja API, konteneryzacja (Docker)
 
 ## 6. Podsumowanie (30 s)
